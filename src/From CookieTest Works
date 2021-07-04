@@ -1,0 +1,122 @@
+package fortuneCookies;
+
+import javax.crypto.BadPaddingException;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.concurrent.atomic.DoubleAccumulator;
+
+public class FortuneCookies
+{
+
+    private ArrayList cookieList=new ArrayList();
+
+
+
+    //private String fin=new String("/Applications/FortuneCookies/MLTest.txt");
+
+
+    FortuneCookies()
+    {
+        createCookieList();
+        System.out.println("***cookieList is " + cookieList + "****\n");
+   //     System.out.println("Random cookie is: " + getRandomCookie());
+
+    } // constructor
+
+    public static void main(String[] args)
+    {
+        FortuneCookies FortuneCookies=new FortuneCookies();
+      //  System.out.println("main speaks");
+
+
+    }
+
+    void createCookieList()
+    {
+        boolean inMultiLineBuffer = false;
+        BufferedReader reader=null;
+        StringBuilder sbLine;
+        StringBuilder sbMultiLineBuffer=new StringBuilder();
+        String line=null;
+
+        try
+        {
+            reader=new BufferedReader(new FileReader("/Applications/FortuneCookies/CookieTest.txt"));
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+
+        while (true) // infinite loop
+        {
+            try
+            {
+                line=(reader.readLine());
+                if (line == null) //eof or error
+                    break;
+                else if (line.isBlank())
+                    continue;
+                else if (line.charAt(line.length() - 1) == '\\') // line ends in backslash
+                {
+                    inMultiLineBuffer=true;
+                    // amputate backslash
+                    int end=line.length() - 1;
+                    sbLine=new StringBuilder(line);
+                    sbLine.deleteCharAt(end);
+
+                    // add a carriage return
+                    sbLine.append('\n');
+                    // store in buffer until read in subsequent line
+                    sbMultiLineBuffer.append(sbLine);
+               //     System.out.println("sbMultiLineBuffer is: " + sbMultiLineBuffer);
+                    continue;
+                }
+                else // line ends in '\n' iwth no backslash)
+                {
+                    // regular line
+                    if (inMultiLineBuffer)
+                    {
+                        sbMultiLineBuffer.append(line); // add line to buffer
+                        cookieList.add(sbMultiLineBuffer.toString()); // add buffer contents to cookieList
+                        inMultiLineBuffer=false;
+                        continue;
+                    }
+                    else // Single line, no need for buffer.
+                        cookieList.add(line);
+
+                }
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    String getRandomCookie()
+    {
+        Random rn=new Random();
+        int lineNumber=rn.nextInt(cookieList.size());
+
+        //    /*Debugger*/ System.out.println("\n\nRandomly-chosen cookie is " + cookieList.get(lineNumber));
+
+        return (String) cookieList.get(lineNumber);
+    }
+}  // End of FortuneCookies Class
+
+
+
+
+
+
+
+
+
+
+
+
